@@ -11,7 +11,7 @@ function App() {
     //ws.send('request new one')
     
     ws.onmessage = (event) =>{
-      ws.send('just another response for git')
+      ws.send('just another response for another git')
       changeMessage(event.data)
     }
 
