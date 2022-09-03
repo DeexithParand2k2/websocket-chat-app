@@ -10,23 +10,28 @@ const wss = new WebSocket.Server({
 console.log('server is on')
 
 
-//some json object
-const obj = {
-    name: 'username',
-    internId: 007,
-}
+//first count of clients getting connected
+global.clientCount = 0;
 
-//my name
-const obj2 = {
-    name: 'myName',
-    internId: 007,
-}
-
+//array of clients
+global.clientList = []
 
 //connection between socket and socket sever is on
 wss.on('connection',function(ws){
-    //ws.send(JSON.stringify(obj2))
-    ws.send(JSON.stringify(obj))
-    //ws.send('not a json object')
-    console.log('new connection on')
+
+    console.log('new client connected')
+    clientCount++;
+
+    ws.onclose = (event) =>{
+        console.log('client disconnected')
+        clientCount--;
+    }
+
+    ws.onmessage = (event) =>{
+        const {data} = event
+        clientList.push(data)
+        ws.send(JSON.stringify(clientList))
+    }
+
+    console.log('final client count : '+clientCount)
 })

@@ -1,42 +1,32 @@
 //no need to require, already contains native object called WebSocket
 import React, { useState } from 'react'
 
+//next broadcast clients connected to the websocket server
+//and also broadcast them exiting the server
+
 const ws = new WebSocket('ws://localhost:9706/websocketOne')
+
 
 function App() {
 
-  const [bool,changeBool] = useState('false')
-  const [name,changeName] = useState('anonymous')
+  const [user,changeUser] = useState('NIL')
+  const [client,changeClient] = useState([])
 
-  const [but,changeBut] = useState(true)
-  const [triggerDisplay,changeTriggerDisplay] = useState(false)
-
-  ws.onmessage = (event) =>{
-    try{
-      const newObj = JSON.parse(event.data)
-      changeBool(true)
-      changeName(newObj.name)
-    }
-    catch(e){
-      changeBool(false)
-      changeName(e.message)
-    }
+  const newClient = () =>{
+    ws.send(user)
   }
 
-  const trigger = () =>{
-    changeTriggerDisplay(!triggerDisplay)
-    changeBut(!but)
+  ws.onmessage = (event) =>{
+    changeClient(JSON.parse(event.data))
   }
 
   return (
     <div className="App">
-      <button onClick={()=>{trigger()}}>{but===true ? 'show' : 'hide'}</button>
-      { triggerDisplay &&
-            <>
-              <h2>Name:</h2><h4>{name}</h4> 
-              { bool===true ? <p>received</p> : <p>someError</p> }
-            </> 
-      }
+      <input type='text' placeholder='username...' onChange={(e)=>changeUser(e.target.value)}></input>
+      <button onClick={()=>{newClient()}}>new name</button>
+      <>
+        {client.map((eachClient)=> <p>{eachClient}</p>)}
+      </>
     </div>
   );
 }
