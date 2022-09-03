@@ -1,41 +1,42 @@
-//
+//no need to require, already contains native object called WebSocket
 import React, { useState } from 'react'
-
-//const WebSocket = require('ws')
 
 const ws = new WebSocket('ws://localhost:9706/websocketOne')
 
 function App() {
 
-  ws.onopen = () =>{
-    //ws.send('request new one')
-    
-    ws.onmessage = (event) =>{
-      ws.send('just another response for another git')
-      changeMessage(event.data)
+  const [bool,changeBool] = useState('false')
+  const [name,changeName] = useState('anonymous')
+
+  const [but,changeBut] = useState(true)
+  const [triggerDisplay,changeTriggerDisplay] = useState(false)
+
+  ws.onmessage = (event) =>{
+    try{
+      const newObj = JSON.parse(event.data)
+      changeBool(true)
+      changeName(newObj.name)
     }
-
-    // Events another way of handling
-    // ws.addEventListener('message', (event) => { 
-    //   changeMessage(event.data)
-    // })
-
+    catch(e){
+      changeBool(false)
+      changeName(e.message)
+    }
   }
 
-  const [message,changeMessage] = useState('')
-
-  //on open connection listens to get message from server
-  // ws.onmessage = (event) =>{
-  //   changeMessage(event.data)
-  // }
+  const trigger = () =>{
+    changeTriggerDisplay(!triggerDisplay)
+    changeBut(!but)
+  }
 
   return (
     <div className="App">
-      <p>
-        <b>Message : </b>
-        <br></br>
-        client side: {message}
-      </p>
+      <button onClick={()=>{trigger()}}>{but===true ? 'show' : 'hide'}</button>
+      { triggerDisplay &&
+            <>
+              <h2>Name:</h2><h4>{name}</h4> 
+              { bool===true ? <p>received</p> : <p>someError</p> }
+            </> 
+      }
     </div>
   );
 }
